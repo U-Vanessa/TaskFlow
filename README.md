@@ -1,10 +1,10 @@
-# 🌿 Taskflow
+#  Taskflow
 
 > Empowering African Community Cooperatives through Digital Task Management
 
 ---
 
-## 📋 Project Overview
+##  Project Overview
 
 **Taskflow** is a web-based task tracking application designed specifically for African community cooperatives, including farmers' cooperatives, microfinance groups, savings groups, and community development organizations.
 
@@ -13,7 +13,7 @@
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
 In many African communities, cooperatives and community groups manage complex workflows spanning agriculture, microfinance, and community services. Traditional pen-and-paper methods or WhatsApp groups lead to:
 
@@ -29,7 +29,7 @@ These challenges prevent community groups from operating efficiently and scaling
 
 ---
 
-## 👥 Target Users
+##  Target Users
 
 ### Primary Users:
 1. **Community Cooperatives** - Agricultural groups managing crop cycles, harvests, and farm maintenance
@@ -44,7 +44,7 @@ These challenges prevent community groups from operating efficiently and scaling
 
 ---
 
-## ✨ Core Features
+##  Core Features
 
 ### 1. Task Creation & Management
 - Create tasks with title, description, and category
@@ -81,7 +81,7 @@ Tasks are organized into categories relevant to cooperative activities:
 
 ---
 
-## 🛠 Technology Stack
+##  Technology Stack
 
 ### Backend:
 - **Python 3.9+** - Modern, readable server-side logic
@@ -102,7 +102,7 @@ Tasks are organized into categories relevant to cooperative activities:
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Python 3.9 or higher
@@ -150,7 +150,7 @@ The application will start with sample data including:
 
 ---
 
-## 📱 Using the Application
+##  Using the Application
 
 ### Creating a Task
 1. Fill in the task title (required)
@@ -174,7 +174,7 @@ The application will start with sample data including:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 taskflow/
@@ -201,7 +201,7 @@ taskflow/
 
 ---
 
-## 🔐 Security Features
+##  Security Features
 
 ### Repository Security:
 - ✅ Comprehensive `.gitignore` file preventing sensitive data commits
@@ -234,7 +234,7 @@ The `main` branch must be configured with protection rules:
 
 ---
 
-## 🗺️ Development Roadmap
+##  Development Roadmap
 
 ### Completed (Formative 1):
 - ✅ Project ideation and planning
@@ -245,21 +245,21 @@ The `main` branch must be configured with protection rules:
 - ✅ GitHub Projects board
 
 ### Upcoming (Formative 2):
-- 🔄 Docker containerization
-- 🔄 CI/CD pipeline with GitHub Actions
-- 🔄 Infrastructure as Code with Terraform
-- 🔄 Database migration (SQLite/PostgreSQL)
+-  Docker containerization
+-  CI/CD pipeline with GitHub Actions
+-  Infrastructure as Code with Terraform
+-  Database migration (SQLite/PostgreSQL)
 
 ### Future Enhancements:
-- 📧 Email notifications for task assignments
-- 📊 Advanced analytics and reporting
-- 📱 Mobile app version
-- 🔄 Real-time collaboration features
-- 🌐 Multi-language support (Swahili, French, etc.)
+-  Email notifications for task assignments
+-  Advanced analytics and reporting
+-  Mobile app version
+-  Real-time collaboration features
+-  Multi-language support (Swahili, French, etc.)
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 This is a course project. Contributions are welcome through:
 1. Fork the repository
@@ -271,7 +271,7 @@ All pull requests require at least one team member's approval before merging.
 
 ---
 
-## 📝 GitHub Projects Board
+##  GitHub Projects Board
 
 Development is tracked using GitHub Projects (Kanban board):
 - **Backlog**: Planned features and tasks
@@ -288,7 +288,7 @@ Development is tracked using GitHub Projects (Kanban board):
 
 ---
 
-## 📊 API Documentation
+##  API Documentation
 
 ### Endpoints:
 
@@ -347,7 +347,7 @@ Returns task statistics
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Issue: Cannot run the application
 - **Solution**: Ensure Python 3.9+ is installed and virtual environment is activated
@@ -363,13 +363,13 @@ Returns task statistics
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Flask community for the excellent web framework
 - African cooperative communities for inspiration
@@ -377,13 +377,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Contact & Support
-
-For questions about this project, contact:
-- **Team Lead**: [Contact Information]
-- **Repository Issues**: [GitHub Issues Link]
-
----
-
-**Built with 🌿 for African communities**
 
