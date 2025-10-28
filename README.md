@@ -6,8 +6,9 @@
 
 ##  Project Overview
 
-**Taskflow** is a web-based task tracking application designed specifically for African community cooperatives, including farmers' cooperatives, microfinance groups, savings groups, and community development organizations.
+**Taskflow** helps African community cooperatives organize work across agriculture, finance, and community services. It replaces scattered chats and paper notes with a simple, trackable task board.
 
+<<<<<<< HEAD
 
 ---
 
@@ -194,11 +195,53 @@ taskflow/
 ├── .gitignore               # Git ignore rules
 ├── LICENSE                  # MIT License
 └── README.md               # This file
+=======
+### Problem (Why this matters)
+- Hard to track responsibilities and deadlines
+- Low visibility into priorities and progress
+- Communication gaps across teams
 
+---
+
+## 👥 Target Users
+- Community cooperatives (agriculture)
+- Microfinance/savings groups
+- Community organizations and market committees
+
+---
+
+## ✨ Core Features (MVP)
+- Create tasks with title, description, priority, category, due date
+- Assign to a person/group; update status (Pending → In Progress → Completed)
+- Statistics: total, pending, in-progress, high-priority
+- Responsive UI (mobile friendly)
+
+---
+
+## 🛠 Tech Stack
+- Backend: Python 3.9+, Flask
+- Frontend: HTML5, CSS3, Vanilla JavaScript
+- Storage: JSON file (simple local persistence)
+
+---
+
+## 🚀 Run Locally
+Prerequisites: Python 3.9+, pip
+>>>>>>> bea7384 (update README)
+
+```bash
+git clone https://github.com/YOUR_USERNAME/taskflow.git
+cd taskflow
+python -m venv venv
+venv\Scripts\activate   # macOS/Linux: source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+# Open http://localhost:5000
 ```
 
 ---
 
+<<<<<<< HEAD
 ##  Security Features
 
 ### Repository Security:
@@ -375,4 +418,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+=======
+## 🔐 Security & Repo Setup (Required by assignment)
+- `.gitignore` excludes venv, caches, IDE files, secrets, logs
+- Protect `main` branch (GitHub → Settings → Branches → Add rule):
+  - Require pull request and 1 approval
+  - Dismiss stale approvals; require conversation resolution
+  - Require status checks (for future CI) and up‑to‑date branches
+  - Include administrators
+- GitHub Projects board (Kanban): Backlog, In Progress, Done with 8–10 items using user stories
+
+User story format example: "As a team lead, I want to see task stats so that I can prioritize work."
+
+---
+
+## 📄 License
+MIT — see [LICENSE](LICENSE)
+>>>>>>> bea7384 (update README)
 
