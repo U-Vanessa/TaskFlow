@@ -8,8 +8,6 @@
 
 **Taskflow** is a web-based task tracking application designed specifically for African community cooperatives, including farmers' cooperatives, microfinance groups, savings groups, and community development organizations.
 
-### Tagline
-*"From field to finance, track every task that builds community"*
 
 ---
 
