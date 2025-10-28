@@ -1,0 +1,15 @@
+# These are the default owners for everything in the repo
+# Replace YOUR_TEAM_MEMBER_USERNAMES with actual GitHub usernames
+* @username1 @username2 @username3 @username4
+
+# Specific file patterns can be assigned to specific owners
+# Uncomment and customize based on your team structure:
+# /app.py @backend-dev
+# /static/ @frontend-dev
+# /templates/ @frontend-dev
+
+# DevOps files (uncomment when these files are created in future formatives)
+# /.github/ @devops-engineer
+# /Dockerfile @devops-engineer
+# /terraform/ @devops-engineer
+
