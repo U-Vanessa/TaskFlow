@@ -203,14 +203,14 @@ taskflow/
 
 ---
 
-## 👥 Target Users
+##  Target Users
 - Community cooperatives (agriculture)
 - Microfinance/savings groups
 - Community organizations and market committees
 
 ---
 
-## ✨ Core Features (MVP)
+##  Core Features (MVP)
 - Create tasks with title, description, priority, category, due date
 - Assign to a person/group; update status (Pending → In Progress → Completed)
 - Statistics: total, pending, in-progress, high-priority
@@ -218,14 +218,14 @@ taskflow/
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 - Backend: Python 3.9+, Flask
 - Frontend: HTML5, CSS3, Vanilla JavaScript
 - Storage: JSON file (simple local persistence)
 
 ---
 
-## 🚀 Run Locally
+##  Run Locally
 Prerequisites: Python 3.9+, pip
 >>>>>>> bea7384 (update README)
 
@@ -264,16 +264,7 @@ The `main` branch must be configured with protection rules:
 
 ---
 
-## 👥 Team Structure
 
-### Roles (Example - customize based on your team):
-
-- **Team Lead**: [Name] - Project coordination and documentation
-- **Backend Developer**: [Name] - Flask API and database logic
-- **Frontend Developer**: [Name] - UI/UX design and JavaScript functionality
-- **DevOps Engineer**: [Name] - CI/CD, containerization, and deployment
-
----
 
 ##  Development Roadmap
 
@@ -327,66 +318,7 @@ Development is tracked using GitHub Projects (Kanban board):
 - Add labels (feature, bug, devops, security)
 - Organize into columns: Backlog → In Progress → Done
 
----
 
-##  API Documentation
-
-### Endpoints:
-
-#### `GET /api/tasks`
-Returns all tasks
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "title": "Harvest maize in Plot A",
-    "description": "Complete harvesting of maize in the north field",
-    "priority": "high",
-    "assigned_to": "Mwangi Group",
-    "status": "pending",
-    "due_date": "2025-11-15",
-    "category": "Agriculture"
-  }
-]
-```
-
-#### `POST /api/tasks`
-Creates a new task
-**Request Body:**
-```json
-{
-  "title": "Task title",
-  "description": "Task description",
-  "priority": "medium",
-  "assigned_to": "Group name",
-  "status": "pending",
-  "due_date": "2025-11-20",
-  "category": "Agriculture"
-}
-```
-
-#### `PUT /api/tasks/<id>`
-Updates an existing task
-**Request Body:** Same as POST, include fields to update
-
-#### `DELETE /api/tasks/<id>`
-Deletes a task
-
-#### `GET /api/tasks/stats`
-Returns task statistics
-**Response:**
-```json
-{
-  "total": 10,
-  "pending": 5,
-  "in_progress": 3,
-  "completed": 2,
-  "high_priority": 1
-}
-```
-
----
 
 ##  Troubleshooting
 
@@ -419,7 +351,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 =======
-## 🔐 Security & Repo Setup (Required by assignment)
+##  Security & Repo Setup 
 - `.gitignore` excludes venv, caches, IDE files, secrets, logs
 - Protect `main` branch (GitHub → Settings → Branches → Add rule):
   - Require pull request and 1 approval
@@ -428,7 +360,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - Include administrators
 - GitHub Projects board (Kanban): Backlog, In Progress, Done with 8–10 items using user stories
 
-User story format example: "As a team lead, I want to see task stats so that I can prioritize work."
 
 ---
 
