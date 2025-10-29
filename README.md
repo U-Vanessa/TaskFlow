@@ -3,6 +3,14 @@
 > Empowering African Community Cooperatives through Digital Task Management
 
 ---
+## Group Members (Group 5)
+
+-Vanessa Uwonkunda
+
+-Sine Shaday
+
+-Oluwasijibomi Amatoritshe Athanson
+
 
 ##  Project Overview
 
@@ -245,10 +253,10 @@ python app.py
 ##  Security Features
 
 ### Repository Security:
-- ✅ Comprehensive `.gitignore` file preventing sensitive data commits
-- ✅ Environment variable exclusions (`.env`, `secrets.yml`)
-- ✅ Dependency directory exclusions (`venv/`, `node_modules/`)
-- ✅ IDE-specific file exclusions
+-  Comprehensive `.gitignore` file preventing sensitive data commits
+-  Environment variable exclusions (`.env`, `secrets.yml`)
+-  Dependency directory exclusions (`venv/`, `node_modules/`)
+-  IDE-specific file exclusions
 
 ### Branch Protection (GitHub Configuration Required):
 The `main` branch must be configured with protection rules:
@@ -260,7 +268,6 @@ The `main` branch must be configured with protection rules:
 - Require conversation resolution before merging
 - Include administrators (enforce for everyone)
 
-**Configuration:** GitHub repository → Settings → Branches → Add protection rule for `main`
 
 ---
 
@@ -268,26 +275,16 @@ The `main` branch must be configured with protection rules:
 
 ##  Development Roadmap
 
-### Completed (Formative 1):
-- ✅ Project ideation and planning
-- ✅ Initial functional application
-- ✅ Task CRUD operations
-- ✅ Statistics dashboard
-- ✅ Repository security setup
-- ✅ GitHub Projects board
+### Completed :
+-  Project ideation and planning
+-  Initial functional application
+-  Task CRUD operations
+-  Statistics dashboard
+-  Repository security setup
+-  GitHub Projects board
 
-### Upcoming (Formative 2):
--  Docker containerization
--  CI/CD pipeline with GitHub Actions
--  Infrastructure as Code with Terraform
--  Database migration (SQLite/PostgreSQL)
 
-### Future Enhancements:
--  Email notifications for task assignments
--  Advanced analytics and reporting
--  Mobile app version
--  Real-time collaboration features
--  Multi-language support (Swahili, French, etc.)
+
 
 ---
 
