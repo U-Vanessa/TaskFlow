@@ -16,7 +16,6 @@
 
 **Taskflow** helps African community cooperatives organize work across agriculture, finance, and community services. It replaces scattered chats and paper notes with a simple, trackable task board.
 
-<<<<<<< HEAD
 
 ---
 
@@ -249,7 +248,7 @@ python app.py
 
 ---
 
-<<<<<<< HEAD
+
 ##  Security Features
 
 ### Repository Security:
