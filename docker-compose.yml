@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  # Main Flask application service
+  web:
+    # Build from Dockerfile in current directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    # Container name for easy reference
+    container_name: taskflow_web
+    
+    # Port mapping: host:container
+    # Access app at http://localhost:5000
+    ports:
+      - "5000:5000"
+    
+    # Environment variables
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+      - PYTHONUNBUFFERED=1
+    
+    # Mount volumes for development (hot-reload)
+    # Remove this in production for security
+    volumes:
+      - .:/app
+      - /app/__pycache__  # Exclude __pycache__ directory
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Health check to monitor container status
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/tasks/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Connect to custom network
+    networks:
+      - taskflow-network
+
+# Define custom network for service communication
+# If you add a database later, both services can communicate via this network
+networks:
+  taskflow-network:
+    driver: bridge
+
+# Volumes section for persistent data
+# Uncomment if you add a database service
+# volumes:
+#   db-data:
+#     driver: local
