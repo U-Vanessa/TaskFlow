@@ -332,6 +332,116 @@ Development is tracked using GitHub Projects (Kanban board):
 
 ---
 
+##  Docker Setup (Formative 2)
+
+This project is fully containerized for consistent development and deployment across all environments.
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) (version 20.10 or higher)
+- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0 or higher)
+
+### Quick Start with Docker
+
+#### Option 1: Using Docker Compose (Recommended)
+```bash
+# Build and start the container
+docker-compose up --build
+
+# Or run in detached mode (background)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
+Access the application at: **http://localhost:5000**
+
+#### Option 2: Using Docker Directly
+```bash
+# Build the Docker image
+docker build -t taskflow:latest .
+
+# Run the container
+docker run -p 5000:5000 taskflow:latest
+```
+
+### Docker Commands Reference
+
+```bash
+# Build and start services
+docker-compose up --build
+
+# Start in background
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# View running containers
+docker-compose ps
+
+# View logs
+docker-compose logs -f web
+
+# Execute commands inside container
+docker-compose exec web bash
+
+# Remove all containers and volumes
+docker-compose down -v
+
+# Rebuild after code changes
+docker-compose up --build
+```
+
+### Docker Architecture
+
+- **Base Image**: `python:3.11-slim` for smaller image size
+- **Security**: Runs as non-root user (appuser)
+- **Health Checks**: Monitors application status
+- **Networks**: Custom bridge network for service isolation
+- **Volumes**: Mounted for hot-reload during development
+
+### Files Structure
+```
+TaskFlow/
+├── Dockerfile              # Container build instructions
+├── docker-compose.yml      # Multi-container orchestration
+├── .dockerignore          # Excludes unnecessary files from build
+└── .github/
+    └── workflows/
+        └── ci.yml         # Continuous Integration pipeline
+```
+
+### Troubleshooting Docker
+
+**Port already in use:**
+```bash
+# Change port in docker-compose.yml
+ports:
+  - "5001:5000"  # Use 5001 on host instead
+```
+
+**Container won't start:**
+```bash
+# Check logs for errors
+docker-compose logs web
+
+# Verify health status
+docker-compose ps
+```
+
+**Permission errors:**
+```bash
+# On Linux, add user to docker group
+sudo usermod -aG docker $USER
+# Log out and back in
+```
+
+---
+
 ##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
