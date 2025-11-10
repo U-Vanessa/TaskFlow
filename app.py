@@ -13,6 +13,7 @@ app = Flask(__name__)
 # Data storage (in production, use a proper database)
 DATA_FILE = 'tasks.json'
 
+
 def load_tasks():
     """Load tasks from JSON file"""
     if os.path.exists(DATA_FILE):
@@ -20,10 +21,12 @@ def load_tasks():
             return json.load(f)
     return []
 
+
 def save_tasks(tasks):
     """Save tasks to JSON file"""
     with open(DATA_FILE, 'w') as f:
         json.dump(tasks, f, indent=2)
+
 
 def init_tasks():
     """Initialize with sample data"""
@@ -59,15 +62,17 @@ def init_tasks():
             "category": "Community"
         }
     ]
-    
+
     if not os.path.exists(DATA_FILE):
         save_tasks(sample_tasks)
     return sample_tasks
+
 
 @app.route('/')
 def index():
     """Main dashboard page"""
     return render_template('index.html')
+
 
 @app.route('/api/tasks', methods=['GET'])
 def get_tasks():
@@ -75,11 +80,12 @@ def get_tasks():
     tasks = load_tasks()
     return jsonify(tasks)
 
+
 @app.route('/api/tasks', methods=['POST'])
 def create_task():
     """Create a new task"""
     tasks = load_tasks()
-    
+
     new_task = {
         "id": max([t['id'] for t in tasks], default=0) + 1,
         "title": request.json['title'],
@@ -91,24 +97,26 @@ def create_task():
         "category": request.json.get('category', 'General'),
         "created_at": datetime.now().strftime('%Y-%m-%d')
     }
-    
+
     tasks.append(new_task)
     save_tasks(tasks)
-    
+
     return jsonify(new_task), 201
+
 
 @app.route('/api/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     """Update an existing task"""
     tasks = load_tasks()
-    
+
     for task in tasks:
         if task['id'] == task_id:
             task.update(request.json)
             save_tasks(tasks)
             return jsonify(task)
-    
+
     return jsonify({"error": "Task not found"}), 404
+
 
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
@@ -118,11 +126,12 @@ def delete_task(task_id):
     save_tasks(tasks)
     return '', 204
 
+
 @app.route('/api/tasks/stats', methods=['GET'])
 def get_stats():
     """Get task statistics"""
     tasks = load_tasks()
-    
+
     stats = {
         "total": len(tasks),
         "pending": len([t for t in tasks if t['status'] == 'pending']),
@@ -130,11 +139,11 @@ def get_stats():
         "completed": len([t for t in tasks if t['status'] == 'completed']),
         "high_priority": len([t for t in tasks if t['priority'] == 'high'])
     }
-    
+
     return jsonify(stats)
+
 
 if __name__ == '__main__':
     # Initialize with sample data if no data file exists
     init_tasks()
     app.run(debug=True, host='0.0.0.0', port=5000)
-
