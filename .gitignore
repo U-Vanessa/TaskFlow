@@ -89,3 +89,30 @@ htmlcov/
 *.temp
 .cache/
 
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
+terraform/.terraform.lock.hcl
+terraform/crash.log
+terraform/crash.*.log
+
+# Ansible
+ansible/inventory.ini
+ansible/*.retry
+ansible/.vault_pass
+
+# SSH Keys
+*.pem
+*.key
+id_rsa*
+*.ppk
+
+# AWS
+.aws/
+aws-credentials
+
+# Data directory
+data/
+tasks.json

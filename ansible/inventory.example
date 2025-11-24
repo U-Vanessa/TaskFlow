@@ -1,0 +1,14 @@
+# Ansible inventory file
+# Copy this to inventory.ini and update with your actual IPs
+
+[app_vm]
+# Replace with your app VM private IP from Terraform output
+app_vm ansible_host=10.0.10.50 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/taskflow-key.pem
+
+[bastion]
+# Replace with your bastion public IP from Terraform output
+bastion ansible_host=1.2.3.4 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/taskflow-key.pem
+
+[all:vars]
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ec2-user@bastion"'
+

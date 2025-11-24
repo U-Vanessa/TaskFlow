@@ -1,0 +1,131 @@
+name: CD Pipeline - Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: taskflow
+
+jobs:
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Run security scan before deployment
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.build-image.outputs.image }}
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+  deploy:
+    name: Deploy with Ansible
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get Terraform outputs
+        id: terraform-outputs
+        run: |
+          # Get outputs from Terraform state or use AWS CLI to query resources
+          # For this example, we'll use environment variables from secrets
+          echo "app_vm_ip=${{ secrets.APP_VM_PRIVATE_IP }}" >> $GITHUB_OUTPUT
+          echo "bastion_ip=${{ secrets.BASTION_PUBLIC_IP }}" >> $GITHUB_OUTPUT
+          echo "ecr_url=${{ secrets.ECR_REPOSITORY_URL }}" >> $GITHUB_OUTPUT
+          echo "db_host=${{ secrets.DB_HOST }}" >> $GITHUB_OUTPUT
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/taskflow-key.pem
+          chmod 600 ~/.ssh/taskflow-key.pem
+          ssh-keyscan -H ${{ secrets.BASTION_PUBLIC_IP }} >> ~/.ssh/known_hosts || true
+
+      - name: Create Ansible inventory
+        run: |
+          mkdir -p /tmp/ansible
+          cat > /tmp/ansible/inventory.ini << EOF
+          [app_vm]
+          app_vm ansible_host=${{ secrets.APP_VM_PRIVATE_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/taskflow-key.pem
+
+          [bastion]
+          bastion ansible_host=${{ secrets.BASTION_PUBLIC_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/taskflow-key.pem
+
+          [all:vars]
+          ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ec2-user@${{ secrets.BASTION_PUBLIC_IP }} -i ~/.ssh/taskflow-key.pem"'
+          EOF
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Run Ansible playbook
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          cd ansible
+          ansible-playbook -i /tmp/ansible/inventory.ini playbook.yml \
+            -e ecr_repository_url=${{ secrets.ECR_REPOSITORY_URL }} \
+            -e image_tag=${{ github.sha }} \
+            -e aws_region=${{ env.AWS_REGION }} \
+            -e aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e db_host=${{ secrets.DB_HOST }} \
+            -e db_name=${{ secrets.DB_NAME }} \
+            -e db_user=${{ secrets.DB_USER }} \
+            -e db_password=${{ secrets.DB_PASSWORD }} \
+            --ssh-common-args='-o StrictHostKeyChecking=no'
+
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed. Application should be available at:"
+          echo "http://${{ secrets.ALB_DNS_NAME }}"
+

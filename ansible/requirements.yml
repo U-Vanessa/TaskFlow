@@ -1,0 +1,3 @@
+# Ansible collection requirements (if needed)
+# Collections will be installed with: ansible-galaxy collection install -r requirements.yml
+

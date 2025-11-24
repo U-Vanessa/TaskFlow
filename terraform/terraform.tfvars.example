@@ -1,0 +1,17 @@
+# Copy this file to terraform.tfvars and fill in your values
+# terraform.tfvars should be in .gitignore
+
+aws_region = "us-east-1"
+project_name = "taskflow"
+environment = "dev"
+
+# Database credentials (use AWS Secrets Manager in production)
+db_username = "admin"
+db_password = "CHANGE_ME_SECURE_PASSWORD"
+
+# Key pair name (must exist in AWS)
+key_pair_name = "taskflow-key"
+
+# ECR repository name
+ecr_repository_name = "taskflow"
+

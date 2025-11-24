@@ -11,10 +11,16 @@ import os
 app = Flask(__name__)
 
 # Data storage (in production, use a proper database)
-DATA_FILE = 'tasks.json'
+DATA_FILE = os.path.join('data', 'tasks.json') if os.path.exists('data') else 'tasks.json'
+
+def ensure_data_dir():
+    """Ensure data directory exists"""
+    if 'data' in DATA_FILE:
+        os.makedirs('data', exist_ok=True)
 
 def load_tasks():
     """Load tasks from JSON file"""
+    ensure_data_dir()
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as f:
             return json.load(f)
@@ -22,6 +28,7 @@ def load_tasks():
 
 def save_tasks(tasks):
     """Save tasks to JSON file"""
+    ensure_data_dir()
     with open(DATA_FILE, 'w') as f:
         json.dump(tasks, f, indent=2)
 
@@ -133,8 +140,12 @@ def get_stats():
     
     return jsonify(stats)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for monitoring"""
+    return jsonify({"status": "healthy"}), 200
+
 if __name__ == '__main__':
     # Initialize with sample data if no data file exists
     init_tasks()
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
+    app.run(debug=False, host='0.0.0.0', port=5000)

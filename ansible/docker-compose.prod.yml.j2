@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    image: {{ ecr_repository_url }}:{{ image_tag }}
+    container_name: taskflow-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    restart: unless-stopped
+    networks:
+      - taskflow-network
+
+networks:
+  taskflow-network:
+    driver: bridge
+
