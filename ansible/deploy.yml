@@ -1,0 +1,109 @@
+---
+# Main playbook to deploy TaskFlow application
+- name: Deploy TaskFlow Application
+  hosts: app_servers
+  become: yes
+  vars:
+    docker_image: "{{ acr_login_server }}/{{ app_name }}:latest"
+    container_name: "{{ app_name }}-app"
+    
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-pip
+          - python3-docker
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add azureuser to docker group
+      user:
+        name: azureuser
+        groups: docker
+        append: yes
+
+    - name: Install Azure CLI
+      shell: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+      args:
+        creates: /usr/bin/az
+
+    - name: Login to Azure Container Registry
+      docker_login:
+        registry_url: "{{ acr_login_server }}"
+        username: "{{ acr_name }}"
+        password: "{{ acr_password }}"
+        reauthorize: yes
+      when: acr_password is defined
+
+    - name: Pull Docker image from ACR
+      docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+        force_source: yes
+      when: acr_password is defined
+
+    - name: Stop existing container
+      docker_container:
+        name: "{{ container_name }}"
+        state: absent
+      ignore_errors: yes
+
+    - name: Run TaskFlow container
+      docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ app_port }}:{{ app_port }}"
+        env:
+          DATABASE_URL: "postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}?sslmode=require"
+          FLASK_ENV: production
+          PORT: "{{ app_port }}"
+        log_driver: json-file
+        log_options:
+          max-size: "10m"
+          max-file: "3"
+      when: acr_password is defined and db_password is defined
+
+    - name: Wait for application to be ready
+      wait_for:
+        port: "{{ app_port }}"
+        delay: 5
+        timeout: 60
+        msg: "Application failed to start on port {{ app_port }}"

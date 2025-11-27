@@ -1,0 +1,44 @@
+---
+# Playbook to setup bastion host
+- name: Configure Bastion Host
+  hosts: bastion
+  become: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install essential packages
+      apt:
+        name:
+          - vim
+          - curl
+          - wget
+          - git
+          - htop
+          - net-tools
+        state: present
+
+    - name: Configure SSH to allow forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?AllowTcpForwarding'
+        line: 'AllowTcpForwarding yes'
+        state: present
+      notify: Restart SSH
+
+    - name: Configure SSH agent forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?AllowAgentForwarding'
+        line: 'AllowAgentForwarding yes'
+        state: present
+      notify: Restart SSH
+
+  handlers:
+    - name: Restart SSH
+      systemd:
+        name: sshd
+        state: restarted
