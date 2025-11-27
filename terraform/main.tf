@@ -24,6 +24,12 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+# Local values to avoid code duplication
+locals {
+  # SSH public key: prefer file path, then inline key, then auto-generated key
+  ssh_public_key = var.ssh_public_key_path != "" ? file(var.ssh_public_key_path) : (length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh)
+}
+
 # Resource Group
 resource "azurerm_resource_group" "main" {
   name     = "${var.project_name}-rg"
@@ -216,31 +222,10 @@ resource "azurerm_subnet_network_security_group_association" "private_db" {
   network_security_group_id = azurerm_network_security_group.db_sg.id
 }
 
-# Public IP for Bastion
-resource "azurerm_public_ip" "bastion" {
-  name                = "${var.project_name}-bastion-pip"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-
-  tags = {
-    Name = "${var.project_name}-bastion-pip"
-  }
-}
-
-# Public IP for App VM
-resource "azurerm_public_ip" "app_vm" {
-  name                = "${var.project_name}-app-vm-pip"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-
-  tags = {
-    Name = "${var.project_name}-app-vm-pip"
-  }
-}
+# NOTE: Public IPs removed from NICs per Checkov requirements.
+# For jump-host capabilities, use Azure Bastion service instead of VM public IPs.
+# If public IP access is required, consider adding an Azure Bastion resource
+# or a Load Balancer for the application.
 
 # Network Interface for Bastion (Checkov fix - removed public_ip_address_id)
 resource "azurerm_network_interface" "bastion" {
@@ -258,6 +243,7 @@ resource "azurerm_network_interface" "bastion" {
     Name = "${var.project_name}-bastion-nic"
   }
 }
+
 
 # Network Interface for App VM (Checkov fix - removed public_ip_address_id)
 resource "azurerm_network_interface" "app_vm" {
@@ -296,7 +282,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = var.ssh_public_key_path != "" ? file(var.ssh_public_key_path) : (length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh)
+    public_key = local.ssh_public_key
   }
 
   os_disk {
@@ -340,7 +326,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = var.ssh_public_key_path != "" ? file(var.ssh_public_key_path) : (length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh)
+    public_key = local.ssh_public_key
   }
 
   os_disk {

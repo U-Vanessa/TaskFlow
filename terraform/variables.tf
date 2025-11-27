@@ -76,9 +76,14 @@ variable "ssh_public_key_path" {
 }
 
 variable "trusted_ssh_cidr" {
-  description = "Trusted CIDR for SSH access (e.g., your IP address). Must be set for secure SSH access."
+  description = "Trusted CIDR for SSH access (e.g., your IP address/32). Must be set for secure SSH access."
   type        = string
   default     = ""
+
+  validation {
+    condition     = var.trusted_ssh_cidr == "" || can(cidrnetmask(var.trusted_ssh_cidr))
+    error_message = "The trusted_ssh_cidr must be a valid CIDR block (e.g., '10.0.0.0/8' or '203.0.113.50/32')."
+  }
 }
 
 variable "db_name" {

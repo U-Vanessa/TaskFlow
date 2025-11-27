@@ -3,14 +3,12 @@ output "resource_group_name" {
   value       = azurerm_resource_group.main.name
 }
 
-output "bastion_public_ip" {
-  description = "Public IP address of the bastion host"
-  value       = azurerm_public_ip.bastion.ip_address
-}
+# NOTE: Public IPs removed from VMs per Checkov security requirements.
+# Use Azure Bastion service for secure remote access.
 
-output "app_vm_public_ip" {
-  description = "Public IP address of the application VM"
-  value       = azurerm_public_ip.app_vm.ip_address
+output "bastion_private_ip" {
+  description = "Private IP address of the bastion host"
+  value       = azurerm_network_interface.bastion.private_ip_address
 }
 
 output "app_vm_private_ip" {
@@ -42,11 +40,7 @@ output "db_host" {
 
 output "ssh_private_key" {
   description = "SSH private key (if auto-generated)"
-  value       = var.ssh_public_key == "" ? tls_private_key.main.private_key_pem : null
+  value       = var.ssh_public_key == "" && var.ssh_public_key_path == "" ? tls_private_key.main.private_key_pem : null
   sensitive   = true
 }
 
-output "app_url" {
-  description = "URL to access the application"
-  value       = "http://${azurerm_public_ip.app_vm.ip_address}:5000"
-}
