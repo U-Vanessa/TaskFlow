@@ -26,8 +26,16 @@ provider "azurerm" {
 
 # Local values to avoid code duplication
 locals {
-  # SSH public key: prefer file path, then inline key, then auto-generated key
-  ssh_public_key = var.ssh_public_key_path != "" ? file(var.ssh_public_key_path) : (length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh)
+  # SSH public key selection priority:
+  # 1. If ssh_public_key_path is provided, read from file
+  # 2. If ssh_public_key is provided inline, use it directly
+  # 3. Otherwise, use the auto-generated key from tls_private_key resource
+  use_file_key   = var.ssh_public_key_path != ""
+  use_inline_key = !local.use_file_key && length(var.ssh_public_key) > 0
+  ssh_public_key = local.use_file_key ? file(var.ssh_public_key_path) : (local.use_inline_key ? var.ssh_public_key : tls_private_key.main.public_key_openssh)
+
+  # Whether to enable SSH from trusted CIDR
+  enable_trusted_ssh = var.trusted_ssh_cidr != ""
 }
 
 # Resource Group
@@ -110,14 +118,14 @@ resource "azurerm_network_security_group" "bastion" {
   # Allow SSH from trusted CIDR only (Checkov fix)
   # Only applied when trusted_ssh_cidr is provided
   dynamic "security_rule" {
-    for_each = var.trusted_ssh_cidr != "" ? [1] : []
+    for_each = local.enable_trusted_ssh ? [var.trusted_ssh_cidr] : []
     content {
       name                       = "Allow_SSH_Trusted"
       priority                   = 200
       direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "Tcp"
-      source_address_prefix      = var.trusted_ssh_cidr
+      source_address_prefix      = security_rule.value
       source_port_range          = "*"
       destination_address_prefix = "*"
       destination_port_range     = "22"
