@@ -1,20 +1,33 @@
-#  Taskflow
+# 🌍 TaskFlow
 
-> Empowering African Community Cooperatives through Digital Task Management
+> **Empowering African Community Cooperatives through Digital Task Management**
+
+[![Live Application](https://img.shields.io/badge/Live-Production-success?style=for-the-badge)](http://74.225.145.155:5000)
+[![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?style=for-the-badge&logo=microsoft-azure)](https://azure.microsoft.com)
+[![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?style=for-the-badge&logo=terraform)](https://www.terraform.io/)
+[![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
 ---
-## Group Members (Group 5)
 
--Vanessa Uwonkunda
+## 👥 Group 5 Team Members
 
--Sine Shaday
+- **Vanessa Uwonkunda**
+- **Sine Shaday**
+- **Oluwasijibomi Amatoritshe Athanson**
 
--Oluwasijibomi Amatoritshe Athanson
+---
 
+## 🚀 Live Application
 
-##  Project Overview
+**Production URL:** [http://74.225.145.155:5000](http://74.225.145.155:5000)
 
-**Taskflow** helps African community cooperatives organize work across agriculture, finance, and community services. It replaces scattered chats and paper notes with a simple, trackable task board.
+Deployed on Azure infrastructure with complete CI/CD automation.
+
+---
+
+## 📖 Project Overview
+
+**TaskFlow** is a modern task management system designed specifically for African community cooperatives. It helps organizations manage complex workflows across agriculture, microfinance, and community services—replacing scattered communication channels with a centralized, trackable platform.
 
 
 ---
@@ -99,60 +112,215 @@ Tasks are organized into categories relevant to cooperative activities:
 - **CSS3** - Modern styling with custom properties
 - **Vanilla JavaScript** - No framework dependencies, fast and accessible
 
-### Development & Deployment:
-- **Git** - Version control
-- **GitHub** - Repository hosting and collaboration
-- **Docker** (planned for Formative 2) - Containerization
-- **Terraform** (planned for Formative 2) - Infrastructure as Code
-- **AWS/Cloud** (planned for Formative 3) - Cloud deployment
+### DevOps & Infrastructure:
+- **Docker** - Containerization with multi-stage builds
+- **Terraform** - Infrastructure as Code (Azure deployment)
+- **Ansible** - Configuration management and deployment automation
+- **GitHub Actions** - CI/CD pipelines
+- **Azure** - Cloud infrastructure (VMs, Database, Container Registry)
+
+### Security & Compliance:
+- **Trivy** - Container vulnerability scanning
+- **tfsec** - Terraform security analysis
+- **Checkov** - Infrastructure as Code policy checks
+- **Automated scanning** - Integrated into CI/CD pipeline
 
 ---
 
-##  Getting Started
+## 🏗️ Architecture
 
-### Prerequisites
-- Python 3.9 or higher
-- pip (Python package installer)
+### Infrastructure Overview
 
-### Installation Steps
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Azure Cloud                              │
+│                                                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              Virtual Network (10.0.0.0/16)              │   │
+│  │                                                           │   │
+│  │  ┌──────────────────┐         ┌──────────────────┐     │   │
+│  │  │  Public Subnet   │         │  Private Subnet  │     │   │
+│  │  │  (10.0.1.0/24)   │         │  (10.0.10.0/24)  │     │   │
+│  │  │                  │         │                  │     │   │
+│  │  │  ┌────────────┐  │         │  ┌────────────┐  │     │   │
+│  │  │  │  Bastion   │  │ SSH     │  │   App VM   │  │     │   │
+│  │  │  │   Host     │──┼────────>│  │ (Docker)   │  │     │   │
+│  │  │  │52.140.96   │  │  Jump   │  │10.0.10.4   │  │     │   │
+│  │  │  │   .216     │  │         │  │            │  │     │   │
+│  │  │  └────────────┘  │         │  └────┬───────┘  │     │   │
+│  │  │        ▲         │         │       │          │     │   │
+│  │  └────────┼─────────┘         └───────┼──────────┘     │   │
+│  │           │                            │                │   │
+│  └───────────┼────────────────────────────┼────────────────┘   │
+│              │                            │                    │
+│      ┌───────┴─────────┐         ┌────────▼───────────┐       │
+│      │  Azure Container│         │  PostgreSQL        │       │
+│      │   Registry      │         │   Database         │       │
+│      │  (taskflowacr)  │         │ (taskflow-db)      │       │
+│      └─────────────────┘         └────────────────────┘       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                            ▲
+                            │
+                    ┌───────┴────────┐
+                    │  GitHub Actions │
+                    │   CI/CD Pipeline│
+                    └─────────────────┘
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/taskflow.git
-   cd taskflow
-   ```
+### Components
 
-2. **Create a virtual environment** (recommended)
-   ```bash
-   python -m venv venv
-   
-   # On Windows:
-   venv\Scripts\activate
-   
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
+- **Virtual Network**: Isolated network (10.0.0.0/16) with public and private subnets
+- **Bastion Host**: Secure jump server for SSH access (52.140.96.216)
+- **Application VM**: Docker container host in private subnet (10.0.10.4)
+- **Azure Container Registry**: Private Docker image registry
+- **PostgreSQL Database**: Managed database service with SSL connections
+- **Network Security Groups**: Firewall rules controlling traffic flow
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-4. **Run the application**
-   ```bash
-   python app.py
-   ```
+## 🚀 Git-to-Production Workflow
 
-5. **Access the application**
-   Open your web browser and navigate to:
-   ```
-   http://localhost:5000
-   ```
+### Automated CI/CD Pipeline
 
-The application will start with sample data including:
-- Maize harvesting task
-- Microfinance loan repayment tracking
-- Community market organization
+1. **Developer pushes code** → Feature branch
+2. **CI Pipeline triggers automatically**:
+   - Linting (flake8)
+   - Unit tests with coverage
+   - Container security scanning (Trivy)
+   - Infrastructure scanning (tfsec, Checkov)
+3. **Pull Request created** → Code review required
+4. **All checks pass** → Green checkmarks ✅
+5. **Merge to main** → CD Pipeline triggers
+6. **Continuous Deployment**:
+   - Build Docker image
+   - Push to Azure Container Registry
+   - Security scans on registry image
+   - Ansible deploys to VMs
+7. **Application live** → http://74.225.145.155:5000
+
+---
+
+## 🔧 Getting Started
+
+### Local Development
+
+**Prerequisites:**
+- Python 3.11+
+- Docker Desktop
+- Git
+
+**Quick Start:**
+
+```bash
+# Clone repository
+git clone https://github.com/U-Vanessa/TaskFlow.git
+cd TaskFlow
+
+# Create virtual environment
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Linux/Mac
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run locally
+python app.py
+
+# Access at http://localhost:5000
+```
+
+### Docker Development
+
+```bash
+# Build image
+docker build -t taskflow:local .
+
+# Run container
+docker run -d -p 5000:5000 --name taskflow-local taskflow:local
+
+# View logs
+docker logs taskflow-local
+
+# Stop container
+docker stop taskflow-local && docker rm taskflow-local
+```
+
+---
+
+## 🌐 Production Deployment
+
+### Infrastructure Deployment
+
+**Prerequisites:**
+- Azure subscription
+- Terraform >= 1.0
+- Azure CLI
+
+**Deploy infrastructure:**
+
+```bash
+cd terraform
+
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan
+
+# Apply infrastructure
+terraform apply
+
+# Note outputs (IPs, database connection, ACR name)
+terraform output
+```
+
+### Application Deployment
+
+**Option 1: Automated (Recommended)**
+
+Push to `main` branch → GitHub Actions automatically deploys
+
+**Option 2: Manual**
+
+```powershell
+# Windows PowerShell
+.\simple-deploy.ps1
+```
+
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions.
+
+---
+
+## 🔒 DevSecOps Integration
+
+### Security Scanning
+
+**Container Security (Trivy):**
+- Scans Docker images for vulnerabilities
+- Integrated into CI/CD pipeline
+- Results visible in GitHub Security tab
+
+**Infrastructure Security:**
+- **tfsec**: Terraform code analysis
+- **Checkov**: IaC policy compliance checks
+- Automated on every Pull Request
+
+### CI/CD Workflows
+
+**`.github/workflows/ci.yml`** - Runs on PRs:
+- Code linting
+- Unit tests
+- Security scans
+- Docker builds
+
+**`.github/workflows/cd.yml`** - Runs on main:
+- Security validation
+- Image building and scanning
+- Automated deployment via Ansible
+
+See [CI_CD_STATUS.md](CI_CD_STATUS.md) for security scan details.
 
 ---
 
@@ -180,24 +348,41 @@ The application will start with sample data including:
 
 ---
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
-taskflow/
+TaskFlow/
+├── app.py                      # Flask application
+├── Dockerfile                  # Container configuration
+├── requirements.txt            # Python dependencies
+├── tasks.json                  # Task data storage
 │
-├── app.py                    # Flask backend application
-├── requirements.txt          # Python dependencies
-├── tasks.json                # Data storage (auto-generated)
+├── .github/workflows/
+│   ├── ci.yml                 # CI pipeline (tests, security scans)
+│   └── cd.yml                 # CD pipeline (deployment)
+│
+├── terraform/
+│   ├── main.tf                # Infrastructure definition
+│   ├── variables.tf           # Configuration variables
+│   └── outputs.tf             # Infrastructure outputs
+│
+├── ansible/
+│   ├── deploy.yml             # Application deployment playbook
+│   ├── site.yml               # Main orchestration playbook
+│   ├── inventory/hosts.yml    # Server inventory
+│   └── secrets.yml.example    # Secrets template
 │
 ├── templates/
-│   └── index.html           # Main dashboard template
+│   └── index.html             # Web UI template
 │
 ├── static/
-│   ├── styles.css           # Application styling
-│   └── app.js               # Frontend JavaScript logic
+│   ├── styles.css             # Application styles
+│   └── app.js                 # Frontend JavaScript
 │
-├── .github/
-│   └── CODEOWNERS           # Code ownership configuration
+├── docs/
+│   ├── DEPLOYMENT_GUIDE.md    # Deployment instructions
+│   ├── CI_CD_STATUS.md        # Security scan documentation
+│   └── VIDEO_RECORDING_GUIDE.md  # Demo video guide
 │
 ├── .gitignore               # Git ignore rules
 ├── LICENSE                  # MIT License
@@ -342,24 +527,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Flask community for the excellent web framework
 - African cooperative communities for inspiration
-- Course instructors for DevOps methodology guidance
-
----
-
-=======
-##  Security & Repo Setup 
-- `.gitignore` excludes venv, caches, IDE files, secrets, logs
-- Protect `main` branch (GitHub → Settings → Branches → Add rule):
-  - Require pull request and 1 approval
-  - Dismiss stale approvals; require conversation resolution
-  - Require status checks (for future CI) and up‑to‑date branches
-  - Include administrators
-- GitHub Projects board (Kanban): Backlog, In Progress, Done with 8–10 items using user stories
-
-
----
-
-## 📄 License
-MIT — see [LICENSE](LICENSE)
->>>>>>> bea7384 (update README)
-
+- ALU course instructors for DevOps methodology guidance`n- Open-source security tools (Trivy, tfsec, Checkov)`n`n---`n`n##  Support`n`n- **Live Application**: http://74.225.145.155:5000`n- **Repository**: https://github.com/U-Vanessa/TaskFlow`n- **Issues**: GitHub Issues tracker`n`n---`n`n**Built with  by Group 5 for African Community Cooperatives**
