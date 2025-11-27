@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
     tls = {
       source  = "hashicorp/tls"
       version = "~> 4.0"
@@ -177,7 +181,7 @@ resource "azurerm_public_ip" "bastion" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  sku                 = "Basic"
+  sku                 = "Standard"
 
   tags = {
     Name = "${var.project_name}-bastion-pip"
@@ -190,7 +194,7 @@ resource "azurerm_public_ip" "app_vm" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  sku                 = "Basic"
+  sku                 = "Standard"
 
   tags = {
     Name = "${var.project_name}-app-vm-pip"
@@ -253,7 +257,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.main.public_key_openssh
+    public_key = length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh
   }
 
   os_disk {
@@ -297,7 +301,7 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.main.public_key_openssh
+    public_key = length(var.ssh_public_key) > 0 ? var.ssh_public_key : tls_private_key.main.public_key_openssh
   }
 
   os_disk {
@@ -327,9 +331,14 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
   }
 }
 
+# Random ID for globally unique ACR name
+resource "random_id" "acr_suffix" {
+  byte_length = 4
+}
+
 # Azure Container Registry (ACR)
 resource "azurerm_container_registry" "main" {
-  name                = "${replace(var.project_name, "-", "")}acr"
+  name                = "${replace(var.project_name, "-", "")}acr${random_id.acr_suffix.hex}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku                 = "Basic"
@@ -342,7 +351,7 @@ resource "azurerm_container_registry" "main" {
 
 # Azure Database for PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "main" {
-  name                   = "${var.project_name}-db"
+  name                   = "${var.project_name}-db-${random_id.acr_suffix.hex}"
   resource_group_name    = azurerm_resource_group.main.name
   location               = azurerm_resource_group.main.location
   version                = "15"
@@ -357,6 +366,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
 
   backup_retention_days        = 7
   geo_redundant_backup_enabled = false
+  public_network_access_enabled = false
 
   tags = {
     Name = "${var.project_name}-db"
@@ -365,7 +375,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
 
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "main" {
-  name                = "${var.project_name}-postgres.database.azure.com"
+  name                = "taskflow.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.main.name
 }
 
@@ -381,8 +391,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "main" {
 resource "azurerm_postgresql_flexible_server_firewall_rule" "app_vm" {
   name             = "AllowAppVM"
   server_id        = azurerm_postgresql_flexible_server.main.id
-  start_ip_address = azurerm_subnet.private_app.address_prefixes[0]
-  end_ip_address   = cidrhost(azurerm_subnet.private_app.address_prefixes[0], -1)
+  start_ip_address = cidrhost(azurerm_subnet.private_app.address_prefixes[0], 0)
+  end_ip_address   = cidrhost(azurerm_subnet.private_app.address_prefixes[0], 254)
 }
 
 # Database

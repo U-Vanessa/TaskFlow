@@ -63,42 +63,32 @@
         creates: /usr/bin/az
 
     - name: Login to Azure Container Registry
-      docker_login:
-        registry_url: "{{ acr_login_server }}"
-        username: "{{ acr_name }}"
-        password: "{{ acr_password }}"
-        reauthorize: yes
+      shell: |
+        echo "{{ acr_password }}" | docker login {{ acr_login_server }} --username {{ acr_name }} --password-stdin
       when: acr_password is defined
+      no_log: true
 
     - name: Pull Docker image from ACR
-      docker_image:
-        name: "{{ docker_image }}"
-        source: pull
-        force_source: yes
+      shell: docker pull {{ docker_image }}
       when: acr_password is defined
 
-    - name: Stop existing container
-      docker_container:
-        name: "{{ container_name }}"
-        state: absent
+    - name: Remove existing container
+      shell: docker rm {{ container_name }} || true
       ignore_errors: yes
 
     - name: Run TaskFlow container
-      docker_container:
-        name: "{{ container_name }}"
-        image: "{{ docker_image }}"
-        state: started
-        restart_policy: always
-        ports:
-          - "{{ app_port }}:{{ app_port }}"
-        env:
-          DATABASE_URL: "postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}?sslmode=require"
-          FLASK_ENV: production
-          PORT: "{{ app_port }}"
-        log_driver: json-file
-        log_options:
-          max-size: "10m"
-          max-file: "3"
+      shell: |
+        docker run -d \
+          --name {{ container_name }} \
+          --restart always \
+          -p {{ app_port }}:{{ app_port }} \
+          -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}?sslmode=require" \
+          -e FLASK_ENV=production \
+          -e PORT={{ app_port }} \
+          --log-driver json-file \
+          --log-opt max-size=10m \
+          --log-opt max-file=3 \
+          {{ docker_image }}
       when: acr_password is defined and db_password is defined
 
     - name: Wait for application to be ready

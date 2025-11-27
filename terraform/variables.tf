@@ -11,7 +11,7 @@ variable "tenant_id" {
 variable "location" {
   description = "Azure region for resources"
   type        = string
-  default     = "eastus"
+  default     = "centralindia"
 }
 
 variable "project_name" {
@@ -78,7 +78,7 @@ variable "db_name" {
 variable "db_username" {
   description = "Database administrator username"
   type        = string
-  default     = "admin"
+  default     = "taskflowadmin"
   sensitive   = true
 }
 
