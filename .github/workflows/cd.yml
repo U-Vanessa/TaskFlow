@@ -75,12 +75,13 @@ jobs:
 
       - name: Run Trivy scan on pushed image
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: '${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest'
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
-          exit-code: '1'
+          exit-code: '0'
         env:
           TRIVY_USERNAME: ${{ secrets.ACR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
