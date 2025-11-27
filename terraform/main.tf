@@ -108,16 +108,20 @@ resource "azurerm_network_security_group" "bastion" {
   }
 
   # Allow SSH from trusted CIDR only (Checkov fix)
-  security_rule {
-    name                       = "Allow_SSH_Trusted"
-    priority                   = 200
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_address_prefix      = var.trusted_ssh_cidr
-    source_port_range          = "*"
-    destination_address_prefix = "*"
-    destination_port_range     = "22"
+  # Only applied when trusted_ssh_cidr is provided
+  dynamic "security_rule" {
+    for_each = var.trusted_ssh_cidr != "" ? [1] : []
+    content {
+      name                       = "Allow_SSH_Trusted"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_address_prefix      = var.trusted_ssh_cidr
+      source_port_range          = "*"
+      destination_address_prefix = "*"
+      destination_port_range     = "22"
+    }
   }
 
   security_rule {
@@ -190,13 +194,27 @@ resource "azurerm_network_security_group" "db_sg" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
+  # Allow PostgreSQL traffic from App subnet
+  security_rule {
+    name                       = "Allow_PostgreSQL_From_App"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_address_prefix      = var.private_subnet_app_cidr
+    source_port_range          = "*"
+    destination_address_prefix = "*"
+    destination_port_range     = "5432"
+  }
+
+  # Deny all other inbound traffic from Internet
   security_rule {
     name                       = "Deny_Inbound_From_Internet"
-    priority                   = 100
+    priority                   = 200
     direction                  = "Inbound"
     access                     = "Deny"
     protocol                   = "*"
-    source_address_prefix      = "*"
+    source_address_prefix      = "Internet"
     source_port_range          = "*"
     destination_address_prefix = "*"
     destination_port_range     = "*"
@@ -430,7 +448,7 @@ resource "azurerm_private_endpoint" "postgresql" {
 
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "main" {
-  name                = "taskflow.postgres.database.azure.com"
+  name                = "${var.project_name}.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.main.name
 }
 
