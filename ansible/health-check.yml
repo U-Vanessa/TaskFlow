@@ -1,0 +1,35 @@
+---
+# Health check playbook
+- name: Health Check TaskFlow Application
+  hosts: app_servers
+  
+  tasks:
+    - name: Check if Docker is running
+      systemd:
+        name: docker
+      register: docker_status
+
+    - name: Display Docker status
+      debug:
+        msg: "Docker is {{ docker_status.status.ActiveState }}"
+
+    - name: Check if TaskFlow container is running
+      docker_container_info:
+        name: "{{ container_name | default('taskflow-app') }}"
+      register: container_info
+
+    - name: Display container status
+      debug:
+        msg: "Container is {{ 'running' if container_info.exists and container_info.container.State.Running else 'not running' }}"
+
+    - name: Check application endpoint
+      uri:
+        url: "http://localhost:{{ app_port | default(5000) }}"
+        method: GET
+        status_code: 200
+      register: health_check
+      ignore_errors: yes
+
+    - name: Display health check result
+      debug:
+        msg: "Application health check {{ 'PASSED' if health_check.status == 200 else 'FAILED' }}"

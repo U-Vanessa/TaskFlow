@@ -1,0 +1,4 @@
+---
+# Main playbook that orchestrates the entire deployment
+- import_playbook: setup-bastion.yml
+- import_playbook: deploy.yml
