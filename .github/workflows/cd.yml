@@ -14,6 +14,11 @@ on:
           - production
           - staging
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 env:
   ACR_NAME: taskflowacr67f05626
   ACR_LOGIN_SERVER: taskflowacr67f05626.azurecr.io
@@ -87,10 +92,12 @@ jobs:
           TRIVY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
 
       - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
+          category: 'container-security-cd'
 
   deploy:
     runs-on: ubuntu-latest

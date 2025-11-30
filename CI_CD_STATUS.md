@@ -51,6 +51,45 @@ Per the rubric:
 
 ---
 
+## 🔧 **SARIF Upload Configuration**
+
+### **Common Issues and Solutions:**
+
+**Issue 1: "Resource not accessible by integration"**
+- **Cause**: Missing `security-events: write` permission
+- **Solution**: Added `permissions:` block to workflow with:
+  ```yaml
+  permissions:
+    contents: read
+    security-events: write
+    actions: read
+  ```
+
+**Issue 2: "Path does not exist: trivy-results.sarif"**
+- **Cause**: Upload step runs even when scan fails to create file
+- **Solution**: Added conditional check:
+  ```yaml
+  if: always() && hashFiles('trivy-results.sarif') != ''
+  ```
+
+**Issue 3: "CodeQL Action v3 will be deprecated"**
+- **Cause**: Using outdated version
+- **Solution**: Upgraded to `github/codeql-action/upload-sarif@v4`
+
+**Issue 4: "This could be because the Action is running on a pull request from a fork"**
+- **Cause**: Fork PRs have restricted permissions for security
+- **Solution**: Added `continue-on-error: true` for graceful degradation
+
+### **Current SARIF Upload Strategy:**
+```yaml
+# Each scanner uploads to a separate category for clarity:
+- Trivy (container scan): category: 'container-security'
+- Checkov (IaC scan): category: 'iac-security'
+- CD Trivy (deployment): category: 'container-security-cd'
+```
+
+---
+
 ## 📝 **CI/CD Configuration Philosophy**
 
 ### **Development Approach:**
