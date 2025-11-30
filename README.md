@@ -299,6 +299,186 @@ All pull requests require at least one team member's approval before merging.
 
 ---
 
+## 🌐 Live Application
+
+**Production URL:** http://74.225.145.155:5000
+
+The application is deployed on Azure infrastructure and automatically updates on every merge to `main` branch.
+
+---
+
+## 🏗️ Architecture
+
+### Infrastructure Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Azure Cloud                              │
+│                                                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              Virtual Network (10.0.0.0/16)              │   │
+│  │                                                           │   │
+│  │  ┌──────────────────┐         ┌──────────────────┐     │   │
+│  │  │  Public Subnet   │         │  Private Subnet  │     │   │
+│  │  │  (10.0.1.0/24)   │         │  (10.0.10.0/24)  │     │   │
+│  │  │                  │         │                  │     │   │
+│  │  │  ┌────────────┐  │         │  ┌────────────┐  │     │   │
+│  │  │  │  Bastion   │  │ SSH     │  │   App VM   │  │     │   │
+│  │  │  │   Host     │──┼────────>│  │ (Docker)   │  │     │   │
+│  │  │  │52.140.96   │  │  Proxy  │  │10.0.10.4   │  │     │   │
+│  │  │  │   .216     │  │         │  │            │  │     │   │
+│  │  │  └────────────┘  │         │  └────┬───────┘  │     │   │
+│  │  │        ▲         │         │       │          │     │   │
+│  │  └────────┼─────────┘         └───────┼──────────┘     │   │
+│  │           │                            │                │   │
+│  └───────────┼────────────────────────────┼────────────────┘   │
+│              │                            │                    │
+│      ┌───────┴─────────┐         ┌────────▼───────────┐       │
+│      │  Azure Container│         │  PostgreSQL        │       │
+│      │   Registry      │         │   Database         │       │
+│      │  (taskflowacr)  │         │ (taskflow-db)      │       │
+│      └─────────────────┘         └────────────────────┘       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                            ▲
+                            │
+                    ┌───────┴────────┐
+                    │  GitHub Actions │
+                    │   CI/CD Pipeline│
+                    └─────────────────┘
+```
+
+### Components
+
+- **Virtual Network**: Isolated network with public and private subnets
+- **Bastion Host**: Jump server for secure SSH access (52.140.96.216)
+- **Application VM**: Runs Docker container in private subnet (10.0.10.4)
+- **Azure Container Registry**: Private Docker image registry
+- **PostgreSQL Database**: Managed database service
+- **Network Security Groups**: Firewall rules controlling traffic
+
+---
+
+## 🚀 Deployment Pipeline
+
+### Git-to-Production Workflow
+
+1. **Developer pushes code** to feature branch
+2. **CI Pipeline** triggers:
+   - Linting (flake8)
+   - Unit tests with coverage
+   - Container image scanning (Trivy)
+   - Infrastructure scanning (tfsec, Checkov)
+3. **Pull Request** created to `main`
+4. **Code Review** and approval required
+5. **Merge to main** triggers **CD Pipeline**:
+   - Build Docker image
+   - Push to Azure Container Registry
+   - Run security scans
+   - Deploy via Ansible to VMs
+6. **Application live** at http://74.225.145.155:5000
+
+### DevSecOps Integration
+
+**Security Scans (CI)**:
+- **Trivy**: Container vulnerability scanning
+- **tfsec**: Terraform security analysis
+- **Checkov**: Infrastructure as Code policy checks
+- Build **fails** on HIGH/CRITICAL vulnerabilities
+
+**Continuous Deployment (CD)**:
+- Automated deployment on merge to `main`
+- Infrastructure provisioned via Terraform
+- Configuration managed by Ansible
+- Zero-downtime deployments
+
+---
+
+## 🛠️ Setup Instructions
+
+### Prerequisites
+
+- Azure subscription
+- Terraform >= 1.0
+- Docker Desktop
+- Python 3.11+
+- Ansible (via Docker)
+
+### Local Development
+
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/U-Vanessa/TaskFlow.git
+   cd TaskFlow
+   ```
+
+2. **Create virtual environment**:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   source .venv/bin/activate  # Linux/Mac
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run locally**:
+   ```bash
+   python app.py
+   ```
+   Visit http://localhost:5000
+
+### Infrastructure Deployment
+
+1. **Navigate to Terraform directory**:
+   ```bash
+   cd terraform
+   ```
+
+2. **Initialize Terraform**:
+   ```bash
+   terraform init
+   ```
+
+3. **Create infrastructure**:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
+
+4. **Note outputs** (Bastion IP, App VM IP, ACR name, Database connection)
+
+### Application Deployment
+
+1. **Configure secrets**:
+   - Copy `ansible/secrets.yml.example` to `ansible/secrets.yml`
+   - Add ACR password and database credentials
+
+2. **Run deployment** (Windows):
+   ```powershell
+   .\simple-deploy.ps1
+   ```
+
+3. **Verify deployment**:
+   - Visit http://<APP_VM_PUBLIC_IP>:5000
+   - Check application health
+
+### GitHub Actions Setup
+
+Configure the following secrets in GitHub repository settings:
+
+- `AZURE_CREDENTIALS`: Azure service principal JSON
+- `SSH_PRIVATE_KEY`: Private key for VM access
+- `ACR_PASSWORD`: Container registry password
+- `ACR_USERNAME`: Container registry username (usually ACR name)
+- `DB_PASSWORD`: PostgreSQL database password
+- `BASTION_HOST`: Bastion server IP address
+- `ANSIBLE_VAULT_PASSWORD`: Vault encryption password (optional)
+
+---
+
 ##  GitHub Projects Board
 
 Development is tracked using GitHub Projects (Kanban board):

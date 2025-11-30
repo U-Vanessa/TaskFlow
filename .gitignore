@@ -41,6 +41,13 @@ instance/
 config.local.yml
 secrets.yml
 
+# Ansible
+ansible/secrets.yml
+ansible/.vault_pass
+ansible/*.retry
+/tmp/ansible_facts/
+.ansible_vault_pass
+
 # IDE
 .vscode/
 .idea/
