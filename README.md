@@ -287,6 +287,12 @@ The `main` branch must be configured with protection rules:
 
 ---
 
+## Live Demo
+
+[https://www.youtube.com/watch?v=bnZP99ceMoU]([url](https://www.youtube.com/watch?v=bnZP99ceMoU))
+
+---
+
 ##  Contributing
 
 This is a course project. Contributions are welcome through:
@@ -338,26 +344,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-##  Acknowledgments
 
-- Flask community for the excellent web framework
-- African cooperative communities for inspiration
-- Course instructors for DevOps methodology guidance
-
----
-
-=======
-##  Security & Repo Setup 
-- `.gitignore` excludes venv, caches, IDE files, secrets, logs
-- Protect `main` branch (GitHub → Settings → Branches → Add rule):
-  - Require pull request and 1 approval
-  - Dismiss stale approvals; require conversation resolution
-  - Require status checks (for future CI) and up‑to‑date branches
-  - Include administrators
-- GitHub Projects board (Kanban): Backlog, In Progress, Done with 8–10 items using user stories
-
-
----
 
 ## 📄 License
 MIT — see [LICENSE](LICENSE)
